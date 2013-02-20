@@ -15,7 +15,8 @@ History
 
 It's forked from myBudget.
 
-Now it shown only basic interface.
+* Now it shown only basic interface.
+* Code from myBudget ported (not tested)
 
 TODO
 ====
