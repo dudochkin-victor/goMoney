@@ -4,6 +4,9 @@ const Glib = imports.gi.GLib;
 
 Gtk.init(null, 0);
 
+/**
+ * create widget tree ...
+ */
 let Builder = new Gtk.Builder();
 Builder.add_from_file('gomoney.glade');
 
@@ -110,9 +113,9 @@ let m_wDDWindow = Builder.get_object('wDDWindow');
 function osDetect()
 {
     testpath = '/dev';
-    isTWin = FALSE;
+    isTWin = false;
     if (!os.path.isdir(testpath))
-        isTWin = TRUE;
+        isTWin = true;
     return isTWin;
 }
 
@@ -127,7 +130,7 @@ function findPrefix()
     {
         print('RP:  This is bad.  Working directory not found, cannot generate prefix.  May die unexpectedly, fix this!');
         intPrefix='D:\\Program Files';
-        valid=FALSE;
+        valid=false;
     }
     else
     {
@@ -140,7 +143,7 @@ function findPrefix()
 //            intPrefix=cwd[:lCwd-9];
 //        if (string.upper(cwd[lCwd-9:lCwd-1])=='MYBUDGET')
 //            intPrefix=cwd[:lCwd-10];
-        valid=TRUE;
+        valid=true;
     }
     if (debugMsgs)
         print('RP: Working Directory: '+intPrefix);
@@ -232,7 +235,7 @@ function buildPath(str)
 function destroySplash(splashScreen)
 {
     splashScreen.destroy();
-    return FALSE;
+    return false;
 }
 /**
  * Trim leading trailing spaces
@@ -290,17 +293,16 @@ function RecentFiles()
 {
     //"""Transperently handles recent files via config info"""
 
-    function __init__(self,numRecent,isWin,wRecentMenu)
+    function __init__(self,numRecent,wRecentMenu)
 	{
         self.m_iRecent = 0;
-        self.m_isWin = isWin;
         self.m_MaxRecent = numRecent;
         self.m_RecentStack =[''];
         self.m_wRecentMenuBase = wRecentMenu;
 
 // Now fill a recent file stack from config info
 
-        if ((!self.m_isWin) && (self.m_MaxRecent > 0))
+        if (self.m_MaxRecent > 0)
         {
             base_key = '/apps/myBudget/Recent_';
             key = base_key + '1';
@@ -332,7 +334,7 @@ function RecentFiles()
         if (m_iDirty > 0)
         {
             res = querySave();
-            if (res == gtk.RESPONSE_REJECT)
+            if (res == Gtk.RESPONSE_REJECT)
                 return;
         }
         newFile = me.get_data('myName');
@@ -342,11 +344,11 @@ function RecentFiles()
     function buildRecentMenu(self)
    	{
         iSize = len(self.m_RecentStack);
-        self.m_wRecentMenu = gtk.Menu();
+        self.m_wRecentMenu = Gtk.Menu();
         self.m_wRecentMenuBase.set_submenu(self.m_wRecentMenu);
         for (var i in range(iSize))
     	{
-            wMenuItem = gtk.MenuItem(self.getNthRecentShort(i+1));
+            wMenuItem = Gtk.MenuItem(self.getNthRecentShort(i+1));
             wMenuItem.set_data('myName',self.getNthRecent(i+1));
             self.m_wRecentMenu.append(wMenuItem);
             wMenuItem.connect('activate',self.onRecent_cb);
@@ -410,8 +412,6 @@ function RecentFiles()
             self.m_RecentStack.remove(self.m_RecentStack[self.m_iRecent-1]);
             self.m_iRecent -= 1;
         }
-        if (!self.m_isWin)
-        {
             base_key = '/apps/myBudget/Recent_';
             i = 0;
             for (var item in self.m_RecentStack)
@@ -422,7 +422,7 @@ function RecentFiles()
  //               print 'saving ith ',i,' key ',key,' value ',item;
                 i += 1;
             }
-        }
+        
         self.m_iRecent = len(self.m_RecentStack);
         self.m_wRecentMenu.destroy();
         self.buildRecentMenu();
@@ -588,7 +588,7 @@ function dollarToFloat(str)
  */
 function buildCategoryModel()
 {
-    store = gtk.TreeStore(gobject.TYPE_STRING,
+    store = Gtk.TreeStore(gobject.TYPE_STRING,
                           gobject.TYPE_INT,
                           gobject.TYPE_INT,
                           gobject.TYPE_INT);
@@ -653,10 +653,10 @@ function create_model(fileModel)
 function createCategoryTree(fileModel)
 {
     catmodel = create_model(fileModel);
-    catwin = m_pXML.get_widget('catWindow');
-    catTree = gtk.TreeView(catmodel);
-    catTree.set_rules_hint(TRUE);
-    column = gtk.TreeViewColumn(_('Categories'), gtk.CellRendererText(),
+    catwin = Builder.get_widget('catWindow');
+    catTree = Gtk.TreeView(catmodel);
+    catTree.set_rules_hint(true);
+    column = Gtk.TreeViewColumn(_('Categories'), Gtk.CellRendererText(),
                                  text=0);
     catTree.append_column(column);
     catwin.add(catTree);
@@ -673,10 +673,10 @@ function createCategoryTree(fileModel)
 function rebuildCategoryTree()
 {
     catmodel = buildCategoryModel();
-    catwin = m_pXML.get_widget('catWindow');
-    catTree = gtk.TreeView(catmodel);
-    catTree.set_rules_hint(TRUE);
-    column = gtk.TreeViewColumn(_('Categories'), gtk.CellRendererText(),
+    catwin = Builder.get_widget('catWindow');
+    catTree = Gtk.TreeView(catmodel);
+    catTree.set_rules_hint(true);
+    column = Gtk.TreeViewColumn(_('Categories'), Gtk.CellRendererText(),
                                  text=0);
     catTree.append_column(column);
     catwin.add(catTree);
@@ -702,9 +702,9 @@ function createResultsCategoryTree(fileModel)
 {
 	catmodel = create_model(fileModel);
     catwin = m_wResultsCatWindow;
-    catTree = gtk.TreeView(catmodel);
-    catTree.set_rules_hint(TRUE);
-    column = gtk.TreeViewColumn(_('Categories'), gtk.CellRendererText(),
+    catTree = Gtk.TreeView(catmodel);
+    catTree.set_rules_hint(true);
+    column = Gtk.TreeViewColumn(_('Categories'), Gtk.CellRendererText(),
                                  text=0);
     catTree.append_column(column);
     catwin.add(catTree);
@@ -723,9 +723,9 @@ function rebuildResultsCategoryTree()
         m_wResultsCategoryTree.destroy();
     catmodel = buildCategoryModel();
     catwin = m_wResultsCatWindow;
-    catTree = gtk.TreeView(catmodel);
-    catTree.set_rules_hint(TRUE);
-    column = gtk.TreeViewColumn(_('Categories'), gtk.CellRendererText(),
+    catTree = Gtk.TreeView(catmodel);
+    catTree.set_rules_hint(true);
+    column = Gtk.TreeViewColumn(_('Categories'), Gtk.CellRendererText(),
                                  text=0);
     catTree.append_column(column);
     catwin.add(catTree);
@@ -739,29 +739,29 @@ function rebuildResultsCategoryTree()
 function buildRecordTree(newFile)
 {
     m_iNumRecords = 0;
-    store = gtk.TreeStore(gobject.TYPE_STRING,
+    store = Gtk.TreeStore(gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING);
-    recwin = m_pXML.get_widget('wRecordWindow');
-    recTree = gtk.TreeView(store);
-    recTree.set_rules_hint(TRUE);
+    recwin = Builder.get_widget('wRecordWindow');
+    recTree = Gtk.TreeView(store);
+    recTree.set_rules_hint(true);
     sel = recTree.get_selection();
-    sel.set_mode (gtk.SELECTION_MULTIPLE);
-    column = gtk.TreeViewColumn(_('Category  '), gtk.CellRendererText(),
+    sel.set_mode (Gtk.SELECTION_MULTIPLE);
+    column = Gtk.TreeViewColumn(_('Category  '), Gtk.CellRendererText(),
                                  text=0);
     recTree.append_column(column);
-    column = gtk.TreeViewColumn(_('Sub Category  '), gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(_('Sub Category  '), Gtk.CellRendererText(),
                                  text=1);
     recTree.append_column(column);
-    column = gtk.TreeViewColumn(_('Date '), gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(_('Date '), Gtk.CellRendererText(),
                                  text=2);
     recTree.append_column(column);
-    column = gtk.TreeViewColumn(_('Amount '), gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(_('Amount '), Gtk.CellRendererText(),
                                  text=3);
     recTree.append_column(column);
-    column = gtk.TreeViewColumn(_('Comments '), gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(_('Comments '), Gtk.CellRendererText(),
                                  text=4);
     recTree.append_column(column);
     recwin.add(recTree);
@@ -810,13 +810,13 @@ function buildRecordTree(newFile)
 }
 function chooseFile(sFile)
 {
-    response = gtk.RESPONSE_CANCEL;
-    wFileSel = gtk.FileSelection('Choose File');
+    response = Gtk.RESPONSE_CANCEL;
+    wFileSel = Gtk.FileSelection('Choose File');
     wFileSel.show_fileop_buttons();
     if (sFile != '')
         wFileSel.set_filename(sFile);
     response = wFileSel.run();
-    if (response == gtk.RESPONSE_CANCEL)
+    if (response == Gtk.RESPONSE_CANCEL)
         m_sCurrentFile = "";
     else
         m_sCurrentFile = wFileSel.get_filename();
@@ -826,13 +826,13 @@ function chooseFile(sFile)
 
 function chooseExportFile(sFile)
 {
-    response = gtk.RESPONSE_CANCEL;
-    wFileSel = gtk.FileSelection('Choose File');
+    response = Gtk.RESPONSE_CANCEL;
+    wFileSel = Gtk.FileSelection('Choose File');
     wFileSel.show_fileop_buttons();
     if (sFile != '')
         wFileSel.set_filename(sFile);
     response = wFileSel.run();
-    if (response == gtk.RESPONSE_CANCEL)
+    if (response == Gtk.RESPONSE_CANCEL)
         sExpFile = "";
     else
         sExpFile = wFileSel.get_filename();
@@ -930,7 +930,7 @@ function on_MainReplace_cb(me)
     commentBuffer = m_wCommentsText.get_buffer();
     commentStart = commentBuffer.get_start_iter();
     commentEnd = commentBuffer.get_end_iter();
-    commentText = commentBuffer.get_text(commentStart,commentEnd,FALSE);
+    commentText = commentBuffer.get_text(commentStart,commentEnd,false);
     if (m_iEditCurrent >= 0)
     {
         m_allRecords[m_iEditCurrent] =  [catMaj,catMin,dateText,amountText,commentText];
@@ -952,7 +952,7 @@ function on_AddButton_cb(me)
     commentBuffer = m_wCommentsText.get_buffer();
     commentStart = commentBuffer.get_start_iter();
     commentEnd = commentBuffer.get_end_iter();
-    commentText = commentBuffer.get_text(commentStart,commentEnd,FALSE);
+    commentText = commentBuffer.get_text(commentStart,commentEnd,false);
 
     treeIter = TreeStore.append(None,(catMaj,catMin,
                                           dateText,amountText,commentText));
@@ -967,7 +967,7 @@ function on_AddButton_cb(me)
 
 function on_mainQuit_cb(me)
 {
-    gtk.main_quit();
+    Gtk.main_quit();
 }
 
 function daySelected_cb(me)
@@ -1023,30 +1023,37 @@ function catTreeSelection_cb(selection)
 
 function querySave()
 {
-    response = gtk.RESPONSE_NO;
+    response = Gtk.RESPONSE_NO;
     if (m_iDirty == 0)
         return response;
-    qSave = gtk.Dialog("Query Save",
-                     m_wMainWin,
-                     gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                     (gtk.STOCK_SAVE, gtk.RESPONSE_APPLY,
-                      gtk.STOCK_NO, gtk.RESPONSE_NO,
-                      gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT));
-    vbox = qSave.vbox;
-    label = gtk.Label(_('The current document has not been saved.\n If you do not save now some changes will be lost. \n Do you wish to save your document now?'));
-    vbox.add(label);
-    qSave.show_all();
-    response = qSave.run();
-    qSave.destroy();
-    if (response == gtk.RESPONSE_APPLY)
-        ActuallySave();
+    qSave =new Gtk.MessageDialog ({
+        transient_for: m_wMainWin,
+        modal: true,
+        buttons: Gtk.ButtonsType.NONE,
+        message_type: Gtk.MessageType.WARNING,
+        text: "This action will cause the universe to stop existing." });
+    qSave.show();
+//    qSave = new Gtk.Dialog("Query Save",
+//                     m_wMainWin,
+//                     Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+//                     Gtk.STOCK_SAVE, Gtk.RESPONSE_APPLY,
+//                    		 Gtk.STOCK_NO, Gtk.RESPONSE_NO,
+//                    		 Gtk.STOCK_CANCEL, Gtk.RESPONSE_REJECT);
+//    vbox = qSave.vbox;
+//    label = Gtk.Label(_('The current document has not been saved.\n If you do not save now some changes will be lost. \n Do you wish to save your document now?'));
+//    vbox.add(label);
+//    qSave.show_all();
+//    response = qSave.run();
+//    qSave.destroy();
+//    if (response == Gtk.RESPONSE_APPLY)
+//        ActuallySave();
     return response;
 }
 
 function saveAndQuit_cb(me)
 {
     response =  querySave();
-    if (response == gtk.RESPONSE_REJECT)
+    if (response == Gtk.RESPONSE_REJECT)
         return;
     on_mainQuit_cb(me);
 }
@@ -1054,9 +1061,9 @@ function saveAndQuit_cb(me)
 function SaveAndQuit()
 {
     response = querySave();
-    if (response == gtk.RESPONSE_REJECT)
+    if (response == Gtk.RESPONSE_REJECT)
         return;
-    gtk.main_quit();
+    Gtk.main_quit();
 }
 
 function cleanBudget()
@@ -1072,26 +1079,26 @@ function on_New_cb(me)
     if (m_iDirty > 0)
     {
         res = querySave();
-        if (res == gtk.RESPONSE_REJECT)
+        if (res == Gtk.RESPONSE_REJECT)
             return;
     }
     cleanBudget();
     m_wCategoryTree = createCategoryTree('');
     m_wResultsCategoryTree = createResultsCategoryTree('');
     sel = m_wCategoryTree.get_selection();
-    sel.set_mode (gtk.SELECTION_BROWSE);
+    sel.set_mode (Gtk.SELECTION_BROWSE);
     sel.connect('changed',catTreeSelection_cb);
     sel2 = m_wResultsCategoryTree.get_selection();
-    sel2.set_mode(gtk.SELECTION_MULTIPLE);
+    sel2.set_mode(Gtk.SELECTION_MULTIPLE);
     sel2.connect('changed',onResultsCatSelected_cb);
     m_iResultsCatSelected = 0;
     m_wRecordTree = buildRecordTree('');
     m_wBudgetTree = buildBudgetTree();
     sel3 = m_wBudgetTree.get_selection();
-    sel3.set_mode (gtk.SELECTION_BROWSE);
+    sel3.set_mode (Gtk.SELECTION_BROWSE);
     sel3.connect('changed',budgetTreeSelection_cb);
     sel4 = m_wRecordTree.get_selection();
-    sel4.set_mode (gtk.SELECTION_BROWSE);
+    sel4.set_mode (Gtk.SELECTION_BROWSE);
     sel4.connect('changed',recordTreeSelection_cb);
 }
 
@@ -1106,7 +1113,7 @@ function on_Open_cb(me)
     if (m_iDirty > 0)
     {
         res = querySave();
-        if (res == gtk.RESPONSE_REJECT)
+        if (res == Gtk.RESPONSE_REJECT)
             return;
 	}
     sPrevPath = m_RecentFiles.getNthRecent(1);
@@ -1132,20 +1139,20 @@ function doOpenFile(newFile)
     m_wCategoryTree = createCategoryTree(newFile);
     m_wResultsCategoryTree = createResultsCategoryTree(newFile);
     sel = m_wCategoryTree.get_selection();
-    sel.set_mode (gtk.SELECTION_SINGLE);
+    sel.set_mode (Gtk.SELECTION_SINGLE);
     sel.connect('changed',catTreeSelection_cb);
     sel2 = m_wResultsCategoryTree.get_selection();
-    sel2.set_mode(gtk.SELECTION_MULTIPLE);
+    sel2.set_mode(Gtk.SELECTION_MULTIPLE);
     sel2.connect('changed',onResultsCatSelected_cb);
     m_iResultsCatSelected = 0;
     m_iResultsAllCatsChosen = 0;
     m_wRecordTree = buildRecordTree(newFile);
     m_wBudgetTree = buildBudgetTree();
     sel3 = m_wBudgetTree.get_selection();
-    sel3.set_mode (gtk.SELECTION_BROWSE);
+    sel3.set_mode (Gtk.SELECTION_BROWSE);
     sel3.connect('changed',budgetTreeSelection_cb);
     sel4 = m_wRecordTree.get_selection();
-    sel4.set_mode (gtk.SELECTION_BROWSE);
+    sel4.set_mode (Gtk.SELECTION_BROWSE);
     sel4.connect('changed',recordTreeSelection_cb);
 }     
 
@@ -1169,7 +1176,7 @@ function onResultsAllCats_cb(me)
 {
     if (m_iResultsAllCatsChosen == 0)
     {
-        if (m_wResultsAllCategories.get_active() == TRUE)
+        if (m_wResultsAllCategories.get_active() == true)
         {
             sel = m_wResultsCategoryTree.get_selection();
             sel.select_all();
@@ -1179,7 +1186,7 @@ function onResultsAllCats_cb(me)
 	}
     else
     {
-        if (m_wResultsAllCategories.get_active() == FALSE)
+        if (m_wResultsAllCategories.get_active() == false)
         {
             m_iResultsAllCatsChosen = 0;
             if (m_iResultsCatSelected == 0)
@@ -1200,7 +1207,7 @@ function onResultsAllCats_cb(me)
 function inSelectRange(str)
 {
 	//TODO Here error
-    if (m_wResultsAllCategories.get_active() == TRUE) 
+    if (m_wResultsAllCategories.get_active() == true) 
         return 1;
     return 1;
 }
@@ -1246,7 +1253,7 @@ function buildResultsRange()
     myIndexToResults = {'bogus-1':0,'bogus-2':1};
 
 // Make sure all categories are examined if we ask for all categoies
-    if (m_wResultsAllCategories.get_active() == TRUE)
+    if (m_wResultsAllCategories.get_active() == true)
     {
         let [dyear, dmonth, dday] = m_wResultsDateLow.get_date();
         syear = "%d" % dyear;
@@ -1381,32 +1388,32 @@ function buildResultsTree()
     m_fAllBudget = 0.0;
     if (m_iFirstRun == 1)
     {
-        store = gtk.TreeStore(gobject.TYPE_STRING,
+        store = Gtk.TreeStore(gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING);
-        resTree = gtk.TreeView(store);
-        resTree.set_rules_hint(TRUE);
+        resTree = Gtk.TreeView(store);
+        resTree.set_rules_hint(true);
         sel = resTree.get_selection();
-        sel.set_mode (gtk.SELECTION_MULTIPLE);
-        column = gtk.TreeViewColumn(m_sResultsHeadings[0], gtk.CellRendererText(),
+        sel.set_mode (Gtk.SELECTION_MULTIPLE);
+        column = Gtk.TreeViewColumn(m_sResultsHeadings[0], Gtk.CellRendererText(),
                                     text=0);
         resTree.append_column(column);
-        column = gtk.TreeViewColumn(m_sResultsHeadings[1], gtk.CellRendererText(),
+        column = Gtk.TreeViewColumn(m_sResultsHeadings[1], Gtk.CellRendererText(),
                                     text=1);
         resTree.append_column(column);
-        column = gtk.TreeViewColumn(m_sResultsHeadings[2], gtk.CellRendererText(),
+        column = Gtk.TreeViewColumn(m_sResultsHeadings[2], Gtk.CellRendererText(),
                                     text=2);
         resTree.append_column(column);
-        column = gtk.TreeViewColumn(m_sResultsHeadings[3], gtk.CellRendererText(),
+        column = Gtk.TreeViewColumn(m_sResultsHeadings[3], Gtk.CellRendererText(),
                                     text=3);
         resTree.append_column(column);
-        column = gtk.TreeViewColumn(m_sResultsHeadings[4], gtk.CellRendererText(),
+        column = Gtk.TreeViewColumn(m_sResultsHeadings[4], Gtk.CellRendererText(),
                                     text=4);
         resTree.append_column(column);
-        column = gtk.TreeViewColumn(m_sResultsHeadings[5], gtk.CellRendererText(),
+        column = Gtk.TreeViewColumn(m_sResultsHeadings[5], Gtk.CellRendererText(),
                                     text=5);
         resTree.append_column(column);
         m_wResultsWindow.add(resTree);
@@ -1419,33 +1426,33 @@ function buildResultsTree()
 // Now build a treeView to display these as:
 // Key, expended, budget, year's budget difference
 
-    store = gtk.TreeStore(gobject.TYPE_STRING,
+    store = Gtk.TreeStore(gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING);
-    resTree = gtk.TreeView(store);
-    resTree.set_rules_hint(TRUE);
+    resTree = Gtk.TreeView(store);
+    resTree.set_rules_hint(true);
     sel = resTree.get_selection();
-    sel.set_mode (gtk.SELECTION_MULTIPLE);
-    column = gtk.TreeViewColumn(_('Category  '), gtk.CellRendererText(),
+    sel.set_mode (Gtk.SELECTION_MULTIPLE);
+    column = Gtk.TreeViewColumn(_('Category  '), Gtk.CellRendererText(),
                                  text=0);
     resTree.append_column(column);
-    column = gtk.TreeViewColumn(_('Total Expended  '), gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(_('Total Expended  '), Gtk.CellRendererText(),
                                  text=1);
     resTree.append_column(column);
-    column = gtk.TreeViewColumn(_('Budget for Period '), gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(_('Budget for Period '), Gtk.CellRendererText(),
                                  text=2);
     resTree.append_column(column);
-    column = gtk.TreeViewColumn(_('Budget for Year '), gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(_('Budget for Year '), Gtk.CellRendererText(),
                                  text=3);
     resTree.append_column(column);
-    column = gtk.TreeViewColumn(_('Direct Debit  '), gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(_('Direct Debit  '), Gtk.CellRendererText(),
                                  text=4);
     resTree.append_column(column);
-    cell = gtk.CellRendererText();
-    column = gtk.TreeViewColumn(_('Difference '), cell,
+    cell = Gtk.CellRendererText();
+    column = Gtk.TreeViewColumn(_('Difference '), cell,
                                  text=5);
     column.set_cell_data_func(cell,renderRedOrBlue,None);
     resTree.append_column(column);
@@ -1511,7 +1518,7 @@ function recordTreeSelection_cb(me)
     m_wCatMinEntry.set_text(valCatMinor);
     m_wDateEntry.set_text(valDateText);
     m_wAmountEntry.set_text(valAmountText);
-    myBuffer = gtk.TextBuffer();
+    myBuffer = Gtk.TextBuffer();
     myBuffer.set_text(valComment);
     m_wCommentsText.set_buffer(myBuffer);
     m_wCommentsText.show_all();
@@ -1521,29 +1528,29 @@ function recordTreeSelection_cb(me)
  */
 function rebuildRecordTree()
 {
-    store = gtk.TreeStore(gobject.TYPE_STRING,
+    store = Gtk.TreeStore(gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING);
-    recwin = m_pXML.get_widget('wRecordWindow');
-    recTree = gtk.TreeView(store);
-    recTree.set_rules_hint(TRUE);
+    recwin = Builder.get_widget('wRecordWindow');
+    recTree = Gtk.TreeView(store);
+    recTree.set_rules_hint(true);
     sel = recTree.get_selection();
-    sel.set_mode (gtk.SELECTION_MULTIPLE);
-    column = gtk.TreeViewColumn(m_sRecordHeadings[0], gtk.CellRendererText(),
+    sel.set_mode (Gtk.SELECTION_MULTIPLE);
+    column = Gtk.TreeViewColumn(m_sRecordHeadings[0], Gtk.CellRendererText(),
                                  text=0);
     recTree.append_column(column);
-    column = gtk.TreeViewColumn(m_sRecordHeadings[1], gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(m_sRecordHeadings[1], Gtk.CellRendererText(),
                                  text=1);
     recTree.append_column(column);
-    column = gtk.TreeViewColumn(m_sRecordHeadings[2], gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(m_sRecordHeadings[2], Gtk.CellRendererText(),
                                  text=2);
     recTree.append_column(column);
-    column = gtk.TreeViewColumn(m_sRecordHeadings[3], gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(m_sRecordHeadings[3], Gtk.CellRendererText(),
                                  text=3);
     recTree.append_column(column);
-    column = gtk.TreeViewColumn(m_sRecordHeadings[4], gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(m_sRecordHeadings[4], Gtk.CellRendererText(),
                                  text=4);
     recTree.append_column(column);
     recwin.add(recTree);
@@ -1557,7 +1564,7 @@ function rebuildRecordTree()
     }
     m_wRecordTree = recTree;
     sel = m_wRecordTree.get_selection();
-    sel.set_mode (gtk.SELECTION_BROWSE);
+    sel.set_mode (Gtk.SELECTION_BROWSE);
     sel.connect('changed',recordTreeSelection_cb);
 }
 
@@ -1606,34 +1613,34 @@ function buildBudgetTree()
 {
     m_fBudgetTotalYear = 0.0;
     m_fBudgetTotalDD = 0.0;
-    store = gtk.TreeStore(gobject.TYPE_STRING,
+    store = Gtk.TreeStore(gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING);
-    budgetTree = gtk.TreeView(store);
-    budgetTree.set_rules_hint(TRUE);
+    budgetTree = Gtk.TreeView(store);
+    budgetTree.set_rules_hint(true);
     sel = budgetTree.get_selection();
-    sel.set_mode (gtk.SELECTION_BROWSE);
-    column = gtk.TreeViewColumn(m_sBudgetHeadings[0], gtk.CellRendererText(),
+    sel.set_mode (Gtk.SELECTION_BROWSE);
+    column = Gtk.TreeViewColumn(m_sBudgetHeadings[0], Gtk.CellRendererText(),
                                  text=0);
     budgetTree.append_column(column);
-    column = gtk.TreeViewColumn(m_sBudgetHeadings[1], gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(m_sBudgetHeadings[1], Gtk.CellRendererText(),
                                  text=1);
     budgetTree.append_column(column);
-    column = gtk.TreeViewColumn(m_sBudgetHeadings[2], gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(m_sBudgetHeadings[2], Gtk.CellRendererText(),
                                  text=2);
     budgetTree.append_column(column);
-    column = gtk.TreeViewColumn(m_sBudgetHeadings[3], gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(m_sBudgetHeadings[3], Gtk.CellRendererText(),
                                  text=3);
     budgetTree.append_column(column);
 
-    column = gtk.TreeViewColumn(m_sBudgetHeadings[4], gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(m_sBudgetHeadings[4], Gtk.CellRendererText(),
                                  text=4);
     budgetTree.append_column(column);
 
-    column = gtk.TreeViewColumn(m_sBudgetHeadings[5], gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(m_sBudgetHeadings[5], Gtk.CellRendererText(),
                                  text=5);
     budgetTree.append_column(column);
 
@@ -1906,32 +1913,32 @@ function buildDDResultsTree()
 // Now build a treeView to display these as:
 // Key, expended, budget, year's budget difference
 
-    store = gtk.TreeStore(gobject.TYPE_STRING,
+    store = Gtk.TreeStore(gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING,
                           gobject.TYPE_STRING);
-    resTree = gtk.TreeView(store);
-    resTree.set_rules_hint(TRUE);
+    resTree = Gtk.TreeView(store);
+    resTree.set_rules_hint(true);
     sel = resTree.get_selection();
-    sel.set_mode (gtk.SELECTION_MULTIPLE);
-    column = gtk.TreeViewColumn(m_sDDHeadings[0], gtk.CellRendererText(),
+    sel.set_mode (Gtk.SELECTION_MULTIPLE);
+    column = Gtk.TreeViewColumn(m_sDDHeadings[0], Gtk.CellRendererText(),
                                  text=0);
     resTree.append_column(column);
-    column = gtk.TreeViewColumn(m_sDDHeadings[1], gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(m_sDDHeadings[1], Gtk.CellRendererText(),
                                  text=1);
     resTree.append_column(column);
-    column = gtk.TreeViewColumn(m_sDDHeadings[2], gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(m_sDDHeadings[2], Gtk.CellRendererText(),
                                  text=2);
     resTree.append_column(column);
-    column = gtk.TreeViewColumn(m_sDDHeadings[3], gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(m_sDDHeadings[3], Gtk.CellRendererText(),
                                  text=3);
     resTree.append_column(column);
-    column = gtk.TreeViewColumn(m_sDDHeadings[4], gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(m_sDDHeadings[4], Gtk.CellRendererText(),
                                  text=4);
     resTree.append_column(column);
-    column = gtk.TreeViewColumn(m_sDDHeadings[5], gtk.CellRendererText(),
+    column = Gtk.TreeViewColumn(m_sDDHeadings[5], Gtk.CellRendererText(),
                                  text=5);
     resTree.append_column(column);
     m_wResultsWindow.add(resTree);
@@ -1976,13 +1983,13 @@ function onDDDateChanged_cb(me){
     
 function on_ChooseDDTarget_cb(me)
 {
-    var myDate = gtk.Dialog("Direct Debit savings at date",
+    var myDate = Gtk.Dialog("Direct Debit savings at date",
                      m_wMainWin,
-                     gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                     (gtk.STOCK_OK, gtk.RESPONSE_APPLY,
-                      gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT));
+                     Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+                     (Gtk.STOCK_OK, Gtk.RESPONSE_APPLY,
+                      Gtk.STOCK_CANCEL, Gtk.RESPONSE_REJECT));
     vbox = myDate.vbox;
-    date = gtk.Calendar();
+    date = Gtk.Calendar();
     date.connect('day_selected',BudDaySelected_cb);
     vbox.add(date);
     myDate.show_all();
@@ -1997,18 +2004,18 @@ function on_ChooseDDTarget_cb(me)
 
 function on_ChooseFirstDate_cb(me)
 {
-    var myDate = gtk.Dialog("First Payment Date",
+    var myDate = Gtk.Dialog("First Payment Date",
                      m_wMainWin,
-                     gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                     (gtk.STOCK_OK, gtk.RESPONSE_APPLY,
-                      gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT));
+                     Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+                     (Gtk.STOCK_OK, Gtk.RESPONSE_APPLY,
+                      Gtk.STOCK_CANCEL, Gtk.RESPONSE_REJECT));
     vbox = myDate.vbox;
-    date = gtk.Calendar();
+    date = Gtk.Calendar();
     date.connect('day_selected',BudDaySelected_cb);
     vbox.add(date);
     myDate.show_all();
     response = myDate.run();
-    if (response == gtk.RESPONSE_APPLY)
+    if (response == Gtk.RESPONSE_APPLY)
     {
         day,mon,year = string.split(m_sBudDay,'/');
         imon = string.atoi(mon) +1;
@@ -2097,14 +2104,14 @@ function rebuildTrees(){
     m_wResultsCategoryTree = rebuildResultsCategoryTree();
     rebuildDDTree();
     sel = m_wCategoryTree.get_selection();
-    sel.set_mode (gtk.SELECTION_BROWSE);
+    sel.set_mode (Gtk.SELECTION_BROWSE);
     sel.connect('changed',catTreeSelection_cb);
     sel2 = m_wResultsCategoryTree.get_selection();
-    sel2.set_mode(gtk.SELECTION_MULTIPLE);
+    sel2.set_mode(Gtk.SELECTION_MULTIPLE);
     sel2.connect('changed',onResultsCatSelected_cb);
     m_iResultsCatSelected = 0;
     sel3 = m_wBudgetTree.get_selection();
-    sel3.set_mode (gtk.SELECTION_BROWSE);
+    sel3.set_mode (Gtk.SELECTION_BROWSE);
     sel3.connect('changed',budgetTreeSelection_cb);
     return;
 }
@@ -2326,13 +2333,13 @@ function exportToAbiword(tree,sAbiFile,sHeadings)
         os.system(lin);
     }
     else {
-        response = gtk.RESPONSE_NO;
-        noAbi = gtk.Dialog(_('No AbiWord',
+        response = Gtk.RESPONSE_NO;
+        noAbi = Gtk.Dialog(_('No AbiWord',
                              m_wMainWin,
-                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                             (gtk.STOCK_OK, gtk.RESPONSE_NO)));
+                             Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+                             (Gtk.STOCK_OK, Gtk.RESPONSE_NO)));
         vbox = noAbi.vbox;
-        label = gtk.Label(_('You do not have the AbiWord Word processor installed on your system. \n You can download this excellent && free Word Processor from http://www.abisource.com'));
+        label = Gtk.Label(_('You do not have the AbiWord Word processor installed on your system. \n You can download this excellent && free Word Processor from http://www.abisource.com'));
         vbox.add(label);
         noAbi.show_all();
         response = noAbi.run();
@@ -2589,23 +2596,17 @@ function onAbiExportDD(me){
     return;
 }
 
-    
 function onConfigure_cb(me,event){
     let [iWidth, iHeight] = m_wMainWin.get_size();
     var sWidth = "%d" % iWidth;
     var sHeight = "%d" % iHeight;
-    if (!isWin)
-    {
-        m_GConfClient.set_string('/apps/myBudget/width',sWidth);
-        m_GConfClient.set_string('/apps/myBudget/height',sHeight);
-    }
+    //m_GConfClient.set_string('/apps/myBudget/width',sWidth);
+    //m_GConfClient.set_string('/apps/myBudget/height',sHeight);
     return;
 }
 
 function onHelp_cb(me){
     var sDocPath = buildPath('docs'+pDelim+'MyBudget.html');
-    if (isWin)
-        webbrowser.open(sDocPath);
     m_sBrowser = findLinuxBrowser();
     if (m_sBrowser != None)
         os.system(m_sBrowser+' '+sDocPath+' &');
@@ -2613,13 +2614,13 @@ function onHelp_cb(me){
 }
     
 function onAbout_cb(me){
-    var response = gtk.RESPONSE_OK
+    var response = Gtk.RESPONSE_OK
     var qAbout = Gtk.Dialog(_('About MyBudget'),
                      m_wMainWin,
                      Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
                      (Gtk.STOCK_OK, Gtk.RESPONSE_OK))
     var vbox = qAbout.vbox;
-    var label = gtk.Label(_('MyBudget is a personal finance program. \n (C) Martin Sevior <msevior@physics.unimelb.edu.au> \n This program is Free Software licensed under the Lesser General Public License (LGPL) \n'));
+    var label = Gtk.Label(_('MyBudget is a personal finance program. \n (C) Martin Sevior <msevior@physics.unimelb.edu.au> \n This program is Free Software licensed under the Lesser General Public License (LGPL) \n'));
     vbox.add(label);
     qAbout.show_all();
     response = qAbout.run();
@@ -2659,7 +2660,7 @@ function on_Example_cb(me){
     if (m_iDirty > 0 )
     {
         var res = querySave();
-        if (res == gtk.RESPONSE_REJECT)
+        if (res == Gtk.RESPONSE_REJECT)
             return;
     }
     doOpenFile(sExample);
@@ -2668,85 +2669,81 @@ function on_Example_cb(me){
     
 function connectSignals()
 {
-//	global m_wCategoryTree,m_wBudgetTree,m_wRecordTree,m_wResultsCat
-//    global m_iResultsCatSelected
-//    
+ 
 //    sel = m_wCategoryTree.get_selection()
-//    sel.set_mode (gtk.SELECTION_BROWSE)
+//    sel.set_mode (Gtk.SELECTION_BROWSE)
 //    sel.connect('changed',catTreeSelection_cb)
 //    sel2 = m_wResultsCategoryTree.get_selection()
-//    sel2.set_mode(gtk.SELECTION_MULTIPLE)
+//    sel2.set_mode(Gtk.SELECTION_MULTIPLE)
 //    sel2.connect('changed',onResultsCatSelected_cb)
 //    m_iResultsCatSelected = 0
 //    sel3 = m_wBudgetTree.get_selection()
-//    sel3.set_mode (gtk.SELECTION_BROWSE)
+//    sel3.set_mode (Gtk.SELECTION_BROWSE)
 //    sel3.connect('changed',budgetTreeSelection_cb)
 //    sel4 = m_wRecordTree.get_selection()
-//    sel4.set_mode (gtk.SELECTION_BROWSE)
+//    sel4.set_mode (Gtk.SELECTION_BROWSE)
 //    sel4.connect('changed',recordTreeSelection_cb)
    
-//    wMenuQuit.connect('activate',saveAndQuit_cb)
-//    m_wDateSelector.connect('day_selected',daySelected_cb)
-//    m_wMainWin.connect('destroy', lambda win: SaveAndQuit())
-//    m_wMainWin.connect('configure-event',onConfigure_cb)
-//    m_wAddButton.connect('clicked',on_AddButton_cb)
-//    m_wTBSaveButton.connect('clicked',on_Save_cb)
-//    m_wMenuSave.connect('activate',on_Save_cb)
-//    m_wMenuSaveAs.connect('activate',on_SaveAs_cb)
-//    m_wTBNew.connect('clicked',on_New_cb)
-//    m_wMenuNew.connect('activate',on_New_cb)
-//    m_wTBOpen.connect('clicked',on_Open_cb)
-//    m_wMenuOpen.connect('activate',on_Open_cb)
-//    m_wMenuExample.connect('activate',on_Example_cb)
-//    m_wMainReplace.connect('clicked',on_MainReplace_cb)
-//    m_wMainDelete.connect('clicked',on_MainDelete_cb)
-//    m_wResultsDateLow.connect('day_selected',on_ResultLow_cb)
-//    m_wResultsDateHigh.connect('day_selected',on_ResultHigh_cb)
-//    m_wResultsApply.connect('clicked',on_ApplyResultsRange_cb)
-//    m_wResultsAllCategories.connect('clicked',onResultsAllCats_cb)
-//    m_wMainSort.connect('clicked',on_MainSort_cb)
-//    m_wSortDates.connect('clicked',on_MainSortDates_cb)
-//    m_wBudChooseDDTargetButton.connect('clicked',on_ChooseDDTarget_cb)
-//    m_wBudChooseFirstDateButton.connect('clicked',on_ChooseFirstDate_cb)
-//    m_wBudReplace.connect('clicked',on_BudgetReplace_cb)
-//    m_wBudSort.connect('clicked',on_BudgetSort_cb)
-//    m_wBudAdd.connect('clicked',on_BudgetAdd_cb)
-//    m_wBudDelete.connect('clicked',on_BudgetDelete_cb)
-//    m_wBudNew.connect('clicked',on_BudgetNew_cb)
-//    m_wMenuAbout.connect('activate',onAbout_cb)
-//    m_wMenuHelp.connect('activate',onHelp_cb)
-//    m_wTBExportAbi.connect('clicked',onExportAbi_cb)
-//    m_wTBExportGnumeric.connect('clicked',onExportGnumeric_cb)
-//    m_wMenuExportAbi.connect('activate',onExportAbi_cb)
-//    m_wMenuExportGnumeric.connect('activate',onExportGnumeric_cb)
-//    m_wDDCalendar.connect('day-selected',onDDDateChanged_cb)
+    wMenuQuit.connect('activate',saveAndQuit_cb);
+//    m_wDateSelector.connect('day_selected',daySelected_cb);
+    m_wMainWin.connect('destroy', SaveAndQuit);
+    m_wMainWin.connect('configure-event',onConfigure_cb);
+//    m_wAddButton.connect('clicked',on_AddButton_cb);
+    m_wTBSaveButton.connect('clicked',on_Save_cb);
+    m_wMenuSave.connect('activate',on_Save_cb);
+    m_wMenuSaveAs.connect('activate',on_SaveAs_cb);
+    m_wTBNew.connect('clicked',on_New_cb);
+    m_wMenuNew.connect('activate',on_New_cb);
+    m_wTBOpen.connect('clicked',on_Open_cb);
+    m_wMenuOpen.connect('activate',on_Open_cb);
+    m_wMenuExample.connect('activate',on_Example_cb);
+    m_wMainReplace.connect('clicked',on_MainReplace_cb);
+    m_wMainDelete.connect('clicked',on_MainDelete_cb);
+    m_wResultsDateLow.connect('day_selected',on_ResultLow_cb);
+    m_wResultsDateHigh.connect('day_selected',on_ResultHigh_cb);
+    m_wResultsApply.connect('clicked',on_ApplyResultsRange_cb);
+    m_wResultsAllCategories.connect('clicked',onResultsAllCats_cb);
+    m_wMainSort.connect('clicked',on_MainSort_cb);
+    m_wSortDates.connect('clicked',on_MainSortDates_cb);
+    m_wBudChooseDDTargetButton.connect('clicked',on_ChooseDDTarget_cb);
+    m_wBudChooseFirstDateButton.connect('clicked',on_ChooseFirstDate_cb);
+    m_wBudReplace.connect('clicked',on_BudgetReplace_cb);
+    m_wBudSort.connect('clicked',on_BudgetSort_cb);
+    m_wBudAdd.connect('clicked',on_BudgetAdd_cb);
+    m_wBudDelete.connect('clicked',on_BudgetDelete_cb);
+    m_wBudNew.connect('clicked',on_BudgetNew_cb);
+    m_wMenuAbout.connect('activate',onAbout_cb);
+    m_wMenuHelp.connect('activate',onHelp_cb);
+    m_wTBExportAbi.connect('clicked',onExportAbi_cb);
+    m_wTBExportGnumeric.connect('clicked',onExportGnumeric_cb);
+    m_wMenuExportAbi.connect('activate',onExportAbi_cb);
+    m_wMenuExportGnumeric.connect('activate',onExportGnumeric_cb);
+    m_wDDCalendar.connect('day-selected',onDDDateChanged_cb);
 	
 }
+
+/**
+ * Debug Messages Value
+ * Set to true to turn on debug printing
+ * Set to false to hide all but critical messages for end users
+ */ 
+let debugMsgs=true;
+/**
+ * Member variables && structures.
+ */
+var m_iCurrentCatIndex = null; // Points to the current selected item in caterogies
+var m_wCatEntry = null;  // The catergory entry 
+var m_wDateEntry = null;  // The Date entry widget
+var m_wAmountEntry = null;  // The amount entry widget
+var m_wCommentsText = null; // The Comments TextView
+var m_wDateSelector = null; // The Date selector widget
+var m_wAddButton = null;  // The "add" buttom
+var m_allItems = null; // The list Of catergories (maj,min,Budget,Num/year,First due)
+
 connectSignals();
-win.show_all(); // As in previous we need to show all
 
-// And run
-Gtk.main();
-
-////////////////////////////////////////////////
-//
-//# Debug Messages Value
-//# Set to TRUE to turn on debug printing
-//# Set to FALSE to hide all but critical messages for end users
-//debugMsgs=TRUE
-//
-//
-//
-//isWin=osDetect()
 //pDelim = ''
-//if isWin:
-//    global pDelim
-//    pDelim="\\"
-//else:
-//    pDelim='/'
-//
-//
-//            
+            
 //sPREFIX=findPrefix()
 //if debugMsgs:
 //    print('RP: sPREFIX:'+sPREFIX)
@@ -2755,51 +2752,41 @@ Gtk.main();
 //sPath = os.getenv('PATH')
 //sPaths = string.split(sPath,':')
 //
-//#
-//# Member variables && structures.
-//#
-//# m_iCurrentCatIndex // Points to the current selected item in caterogies
-//# m_pXML // The glade class that holds the interface
-//# m_wCatEntry  // The catergory entry 
-//# m_wDateEntry  // The Date entry widget
-//# m_wAmountEntry  // The amount entry widget
-//# m_wCommentsText // The Comments TextView
-//# m_wDateSelector // The Date selector widget
-//# m_wAddButton  // The "add" buttom
-//# m_allItems // The list Of catergories (maj,min,Budget,Num/year,First due)
 //
-//
-//
-//#
-//# Fire up the splashscreen
-//#
-//splashDelay =3000
-//wSplash = gtk.Window(gtk.WINDOW_POPUP )
-//wSplash.set_decorated(FALSE)
-//wSplashScreen = gtk.Image()
-//sSplash = buildPath('splashscreen.png')
-//if debugMsgs:
-//    print 'MSEVIOR: splashscreen path ',sSplash
-//    print 'MSEVIOR: exists.. ',os.path.exists(sSplash)
-//wSplashScreen.set_from_file(sSplash)
-//wSplashScreen.show()
-//# Make a pretty frame
-//
-//wSplashFrame = gtk.Frame()
-//wSplashFrame.set_shadow_type(gtk.SHADOW_OUT)
-//wSplashFrame.add(wSplashScreen)
-//wSplashFrame.show()
-//wSplash.add(wSplashFrame)
-//
-//#
-//# OK throw up the splashscreen
-//#
-//wSplash.set_position(gtk.WIN_POS_CENTER_ALWAYS)
-//wSplash.show()
-//gtk.main_iteration(TRUE)
-//for i in range(5):
-//    gtk.main_iteration()
-//
+/**
+ * Fire up the splashscreen
+ */
+var splashDelay = 3000;
+var wSplash = new Gtk.Window(Gtk.WINDOW_POPUP );
+wSplash.set_decorated(false);
+wSplashScreen = new Gtk.Image();
+sSplash = /*buildPath(*/'splashscreen.png'/*)*/;
+if (debugMsgs)
+{
+    print ('MSEVIOR: splashscreen path ',sSplash)
+//    print 'MSEVIOR: exists.. ',os.path.exists(sSplash))
+}
+wSplashScreen.set_from_file(sSplash);
+wSplashScreen.show();
+/**
+ * Make a pretty frame
+ */ 
+var wSplashFrame = new Gtk.Frame();
+//wSplashFrame.set_shadow_type(Gtk.SHADOW_OUT);
+wSplashFrame.add(wSplashScreen);
+wSplashFrame.show();
+wSplash.add(wSplashFrame);
+
+/**
+ * OK throw up the splashscreen
+ */
+//wSplash.set_position(Gtk.WIN_POS_CENTER_ALWAYS)
+wSplash.show()
+
+Gtk.main_iteration(true);
+//for(var i in range(5))
+//    Gtk.main_iteration();
+
 //gobject.timeout_add(splashDelay,destroySplash,wSplash)
 //
 //inGnuHead = open(buildPath('gnumeric_head.txt'),'r')
@@ -2818,92 +2805,82 @@ Gtk.main();
 //#print "Gumeric Foot is ",m_sGnumericFoot
 //
 //fname = buildPath(pDelim+'glade'+pDelim+'mybudget.glade')
-//    
-//
-// 
-//# create widget tree ...
-//
-//m_pXML = gtk.glade.XML(fname)
-//
+
 //gettext.textdomain('myBudget')
 //gettext.bindtextdomain('myBudget', buildPath('po'+pDelim))
 //_ = gettext.gettext
-//
-//#
-//# Load GConf now if we're not on Windows
-//#
-//if isWin:
-//    import _winreg
-//else:
+
+/**
+ * Load GConf now if we're not on Windows
+ */
 //    import gconf
 //    m_GConfClient = gconf.client_get_default ()
-//
-//
+
 //sInitialFile = None
 //if len(sys.argv) > 1:
 //    sInitialFile = sys.argv[1]
 //    if os.path.exists(sInitialFile):
 //        sInitialFile = None
-//
-//
-//#
-//# Read in the Categories && make the result globally available
-//#
-//m_allItems = [['','','','','',''],['','','','','','']]
-//m_allRecords = [['','','','',''],['','','','','']]
-//m_iNumRecords = 0
-//m_LastBudgetRecord =['','','','','','']
-//#
-//# Set up the global variables
-//#
-//m_iEditCurrent = -1
-//m_iBudEditCurrent = -1
-//m_iCurrentCatIndex = 0
-//m_sCurrentFile = ''
-//m_iDirty = 0
-//m_iResultsCatSelected = 0
-//
-//
-//m_wCatMajEntry.set_property('editable',FALSE)
-//m_wCatMinEntry.set_property('editable',FALSE)
-//m_iResultsAllCatsChosen = 0;
-//
-//defEnterOrEdit = 0
-//defTotals = 1
-//defBudget = 2
-//defDirectDebit = 3
-//
-//m_iResultDateLow = 0
-//m_iResultDateHigh = 999999
-//m_fAllExpenses = 0.0
-//m_fDDExpenses = 0.0
-//m_fAllBudget = 0.0
-//m_fDDBudget = 0.0
-//m_fBudgetTotalYear = 0.0
-//m_fBudgetTotalDD = 0.0
-//m_fBudgetTargetDD = 0.0
-//
-//#
-//# Class to deal with Recent Files
-//#
-//m_RecentFiles = RecentFiles(4,isWin,m_wRecentFiles)
+
+/**
+ * Read in the Categories && make the result globally available
+ */
+
+var m_allItems = [['','','','','',''],['','','','','','']];
+var m_allRecords = [['','','','',''],['','','','','']];
+var m_iNumRecords = 0;
+var m_LastBudgetRecord =['','','','','',''];
+
+/**
+ * Set up the global variables
+ */
+
+var m_iEditCurrent = -1;
+var m_iBudEditCurrent = -1;
+var m_iCurrentCatIndex = 0;
+var m_sCurrentFile = '';
+var m_iDirty = 0;
+var m_iResultsCatSelected = 0;
+var defEnterOrEdit = 0;
+var defTotals = 1;
+var defBudget = 2;
+var defDirectDebit = 3;
+var m_iResultsAllCatsChosen = 0;
+var m_iResultDateLow = 0;
+var m_iResultDateHigh = 999999;
+var m_fAllExpenses = 0.0;
+var m_fDDExpenses = 0.0;
+var m_fAllBudget = 0.0;
+var m_fDDBudget = 0.0;
+var m_fBudgetTotalYear = 0.0;
+var m_fBudgetTotalDD = 0.0;
+var m_fBudgetTargetDD = 0.0;
+var m_monthDays = [31,28,31,30,31,30,31,31,30,31,30,31];
+var sInitialFile = null;
+var m_fDDExpens = 0.0;
+var m_fFullBudget = 0.0;
+var m_fFullExpense = 0.0
+var m_iFirstRun = 1;
+
+//m_wCatMajEntry.set_property('editable',false)
+//m_wCatMinEntry.set_property('editable',false)
+
+/**
+ * Class to deal with Recent Files
+ */
+
+//m_RecentFiles = new RecentFiles(4,m_wRecentFiles)
 //if sInitialFile == None:
 //#    print 'Attempt to get Initial file..'
 //    sInitialFile = m_RecentFiles.getNthRecent(1)
-//
-//   
-//
-//
-//m_monthDays = [31,28,31,30,31,30,31,31,30,31,30,31]
-//
-//
+
+
 //if sInitialFile == None:
 //    sInitialFile = ''
 //    
-//m_wCategoryTree = createCategoryTree(sInitialFile)
-//m_wResultsCategoryTree = createResultsCategoryTree(sInitialFile)
-//
-//
+//var m_wCategoryTree = createCategoryTree(sInitialFile);
+//var m_wResultsCategoryTree = createResultsCategoryTree(sInitialFile);
+
 //if sInitialFile == None:
 //    m_wRecordTree = buildRecordTree('')
 //elif os.path.exists(sInitialFile):
@@ -2911,94 +2888,73 @@ Gtk.main();
 //else:
 //    m_wRecordTree = buildRecordTree('')
 //
-//m_EditIter = m_wRecordTree.get_model().get_iter_root()
+//var m_EditIter = m_wRecordTree.get_model().get_iter_root();
+
+/**
+ * Build the results data structure.
+ * It's a list containing the following fields
+ * Combined categories, Accumulated Expenses, Budgeted Expenses, Difference
+ * To work efficiently we need a Dictionary data structure that maps
+ * the combined category strings to an index into the categories List.
+ */
+
+//var m_sResultsHeadings = [_('Category  '),('Total Expended  ')];
+//var m_sResultsHeadings.append(_('Budget for Period '));
+//var m_sResultsHeadings.append(_('Budget for Year '));
+//var m_sResultsHeadings.append(_('Direct Debit  '));
+//var m_sResultsHeadings.append(_('Difference '));
+
+//var m_wResultsTree = buildResultsTree()
+
+//var m_sRecordHeadings = [_('Category  '),_('Sub Category  ')];
+//var m_sRecordHeadings.append(_('Date '));
+//var m_sRecordHeadings.append(_('Amount '));
+//var m_sRecordHeadings.append(_('Comments '));
 //
-//
-//
-//# Build the results data structure.
-//# It's a list containing the following fields
-//# Combined categories, Accumulated Expenses, Budgeted Expenses, Difference
-//# To work efficiently we need a Dictionary data structure that maps
-//# the combined category strings to an index into the categories List.
-//
-//m_fDDBudget = 0.0
-//m_fDDExpens = 0.0
-//m_fFullBudget = 0.0
-//m_fFullExpense = 0.0
-//        
-//m_iFirstRun = 1
-//m_sResultsHeadings = [_('Category  '),('Total Expended  ')]
-//m_sResultsHeadings.append(_('Budget for Period '))
-//m_sResultsHeadings.append(_('Budget for Year '))
-//m_sResultsHeadings.append(_('Direct Debit  '))
-//m_sResultsHeadings.append(_('Difference '))
-//
-//
-//m_wResultsTree = buildResultsTree()
-//
-//
-//
-//m_sRecordHeadings = [_('Category  '),_('Sub Category  ')]
-//m_sRecordHeadings.append(_('Date '))
-//m_sRecordHeadings.append(_('Amount '))
-//m_sRecordHeadings.append(_('Comments '))
-//
-//m_sBudgetHeadings = [_('Category  '),_('Sub Category  ')]
-//m_sBudgetHeadings.append(_('Yearly Budget '))
-//m_sBudgetHeadings.append(_('Num Scheduled Payments '))
-//m_sBudgetHeadings.append(_('Date First Payment '))
-//m_sBudgetHeadings.append(_('Cash or Direct Debit '))
-//
-//m_wBudgetTree = buildBudgetTree()
-//
-//m_sBudDay = ""
-//
-//m_sDDDate = ''
-//m_fDDSavings = 0.0
-//m_sDDHeadings = [_('Category  '),_('Total Expended  ')]
-//m_sDDHeadings.append(_('Budget to Date '))
-//m_sDDHeadings.append(_('Next due Date '))
-//m_sDDHeadings.append(_('Budget for Year '))
-//m_sDDHeadings.append(_('Amount needed to be Saved '))
-//
-//m_wDDResultsTree = buildDDResultsTree()
-//m_wDDWindow.add(m_wDDResultsTree)
-//m_wDDWindow.show_all()
-//
-//
-//
-//
-//
+//var m_sBudgetHeadings = [_('Category  '),_('Sub Category  ')];
+//var m_sBudgetHeadings.append(_('Yearly Budget '));
+//var m_sBudgetHeadings.append(_('Num Scheduled Payments '));
+//var m_sBudgetHeadings.append(_('Date First Payment '));
+//var m_sBudgetHeadings.append(_('Cash or Direct Debit '));
+
+//var m_wBudgetTree = buildBudgetTree();
+var m_sBudDay = '';
+
+var m_sDDDate = '';
+var m_fDDSavings = 0.0;
+
+//var m_sDDHeadings = [_('Category  '),_('Total Expended  ')]
+//var m_sDDHeadings.append(_('Budget to Date '))
+//var m_sDDHeadings.append(_('Next due Date '))
+//var m_sDDHeadings.append(_('Budget for Year '))
+//var m_sDDHeadings.append(_('Amount needed to be Saved '))
+
+//var m_wDDResultsTree = buildDDResultsTree();
+//m_wDDWindow.add(m_wDDResultsTree);
+m_wDDWindow.show_all();
+
+
 //def main():
 //    global m_sBrowser
-//    if not isWin:
 //        global m_GConfClient
 //        sWidth = m_GConfClient.get_string('/apps/myBudget/width')
 //        sHeight = m_GConfClient.get_string('/apps/myBudget/height')
 //#    m_sBrowser = m_GConfClient.get_string('/desktop/gnome/applications/browser/exec')
 //#    print 'Browser is ',m_sBrowser
-//    connectSignals()
-//    if debugMsgs:
-//        print('RP: Are we running on Windows?')
-//        print(isWin)
-//        
-//    if isWin:
-//        m_wMainWin.show_all()
-//        (iWidth,iHeight) = m_wMainWin.get_size()
-//        sWidth = "%d" % iWidth
-//        sHeight = "%d" % iHeight
-//        # Note to RP: Save Width to Registry Here
-//    else:
-//        if (sWidth == None) or (sHeight == None):
-//            m_wMainWin.show_all()
-//            (iWidth,iHeight) = m_wMainWin.get_size()
-//            sWidth = "%d" % iWidth
-//            sHeight = "%d" % iHeight
-//            m_GConfClient.set_string('/apps/myBudget/width',sWidth)
-//            m_GConfClient.set_string('/apps/myBudget/height',sHeight)
-//        else:
-//            iWidth = string.atoi(sWidth)
-//            iHeight = string.atoi(sHeight)
-//            m_wMainWin.resize(iWidth,iHeight)
-//            m_wMainWin.show_all()
-//    gtk.main()
+//	if (sWidth == None) or (sHeight == None):
+//	    m_wMainWin.show_all()
+//	    (iWidth,iHeight) = m_wMainWin.get_size()
+//	    sWidth = "%d" % iWidth
+//	    sHeight = "%d" % iHeight
+//	    m_GConfClient.set_string('/apps/myBudget/width',sWidth)
+//	    m_GConfClient.set_string('/apps/myBudget/height',sHeight)
+//	else:
+//	    iWidth = string.atoi(sWidth)
+//	    iHeight = string.atoi(sHeight)
+//	    m_wMainWin.resize(iWidth,iHeight)
+//	    m_wMainWin.show_all()
+
+win.show_all(); // As in previous we need to show all
+
+//And run
+Gtk.main();
